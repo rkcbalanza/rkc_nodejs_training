@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   port: '3306',
   user: 'root',
-  password: '1c3B34r!',
+  password: '',
   database: 'sakila'
 });
 
@@ -52,7 +52,16 @@ router.get('/film/category=:category', function (req, res, next) {
     );
 });
 
-//
+//GET films by actor last name
+router.get('/film/actor=:name', function (req, res, next) {
+    connection.query(
+        "SELECT actor.last_name AS last_name, film.title AS title, film.description AS description FROM actor JOIN film_actor ON actor.actor_id = film_actor.actor_id JOIN film ON film.film_id = film_actor.film_id WHERE actor.last_name = ?",
+        [req.params.name],
+        function (err, results, fields) {
+            res.send(results);
+        }
+    );
+});
 
 //Actor APIs
 //Get ALL actors
