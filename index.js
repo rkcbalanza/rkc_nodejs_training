@@ -10,88 +10,72 @@ const connection = mysql.createConnection({
   host: 'localhost',
   port: '3306',
   user: 'root',
-  password: '',
+  password: '1c3B34r!',
   database: 'sakila'
 });
 
 //
 let router = express.Router();
 
-//Film APIs
-//Get ALL films
-router.get('/film/', function (req, res, next) {
+//Film API
+router.get('/film', function (req, res, next) {
+    let searchObject = {
+        "title" : req.query.title,
+        "actor" : req.query.actor,
+        "category" : req.query.category
+    }
     connection.query(
-        'SELECT * FROM film',
+        `SELECT film.title AS title, film.description AS description, actor.last_name as actor, category.name AS category FROM film
+        JOIN film_actor ON film.film_id = film_actor.film_id
+        JOIN actor ON film_actor.actor_id = actor.actor_id
+        JOIN film_category ON film.film_id = film_category.film_id
+        JOIN category ON film_category.category_id = category.category_id`,
         function (err, results, fields) {
-            if(err) throw err;
-            res.send(results);
-        }
-    );
-});
-
-//Get films by title
-router.get('/film/title=:title', function (req, res, next) {
-    connection.query(
-        "SELECT * FROM film WHERE title LIKE ?",
-        ["%"+req.params.title+"%"],
-        function (err, results, fields) {
-            res.send(results);
-        }
-    );
-});
-
-
-//Get films by category
-router.get('/film/category=:category', function (req, res, next) {
-    connection.query(
-        "SELECT category.name AS category, film.title AS title, film.description AS description FROM category JOIN film_category ON category.category_id = film_category.category_id JOIN film ON film.film_id = film_category.film_id WHERE category.name = ?",
-        [req.params.category],
-        function (err, results, fields) {
-            res.send(results);
-        }
-    );
-});
-
-//GET films by actor last name
-router.get('/film/actor=:name', function (req, res, next) {
-    connection.query(
-        "SELECT actor.last_name AS last_name, film.title AS title, film.description AS description FROM actor JOIN film_actor ON actor.actor_id = film_actor.actor_id JOIN film ON film.film_id = film_actor.film_id WHERE actor.last_name = ?",
-        [req.params.name],
-        function (err, results, fields) {
-            res.send(results);
+            if (err) throw err;
+            if (searchObject) {
+                results = results.filter (
+                    r => (searchObject.title ? r.title.toLowerCase().indexOf(searchObject.title.toLowerCase()) >= 0 : true) &&
+                    (searchObject.actor ? r.actor.toLowerCase().indexOf(searchObject.actor.toLowerCase()) >= 0 : true) &&
+                    (searchObject.category ? r.category.toLowerCase().indexOf(searchObject.category.toLowerCase()) >= 0 : true)
+                )
+                res.send(results);
+            }
         }
     );
 });
 
 //Actor APIs
-//Get ALL actors
-router.get('/actor/', function (req, res, next) {
+router.get('/actor', function (req, res, next) {
+    let searchObject = {
+        "first_name": req.query.first_name,
+        "last_name": req.query.last_name
+    }
     connection.query(
         'SELECT * FROM actor',
         function (err, results, fields) {
-            if(err) throw err;
-            res.send(results);
+            if (err) throw err;
+            if (searchObject) {
+                results = results.filter(
+                    r => (searchObject.first_name ? r.first_name.toLowerCase().indexOf(searchObject.first_name.toLowerCase()) >= 0 : true) &&
+                    (searchObject.last_name ? r.last_name.toLowerCase().indexOf(searchObject.last_name.toLowerCase()) >= 0 : true)
+                )
+                res.send(results);
+            }
         }
     );
 });
 
-//Get actor by first_name
-router.get('/actor/first_name=:firstName', function (req, res, next) {
+//Rental APIs
+//Get Available Films
+router.get('/rental/film=:film_title', function (req, res, next) {
     connection.query(
-        'SELECT * FROM actor WHERE first_name = ?',
-        [req.params.firstName],
-        function (err, results, fields) {
-            res.send(results);
-        }
-    );
-});
-
-
-//Get actor by first_name
-router.get('/actor/last_name=:lastName', function (req, res, next) {
-    connection.query(
-        'SELECT * FROM actor WHERE last_name = ?',
-        [req.params.lastName],
+        `SELECT DISTINCT film.title AS title, film.description AS description, address.address AS store_address FROM film
+        JOIN inventory ON film.film_id = inventory.film_id
+        JOIN store ON inventory.store_id = store.store_id
+        JOIN address ON store.address_id = address.address_id
+        JOIN rental ON  inventory.inventory_id = rental.inventory_id
+        WHERE rental.return_date IS NOT NULL AND film.title LIKE ?`,
+        ['%'+req.params.film_title+'%'],
         function (err, results, fields) {
             res.send(results);
         }
