@@ -1,4 +1,5 @@
 //
+require('dotenv').config();
 const express = require('express');
 let app = express();
 
@@ -22,10 +23,10 @@ router.get('/film', function (req, res, next) {
     let searchObject = {
         "title" : req.query.title,
         "actor" : req.query.actor,
-        "category" : req.query.category
+        "genre" : req.query.genre
     }
     connection.query(
-        `SELECT film.title AS title, film.description AS description, actor.last_name as actor, category.name AS category FROM film
+        `SELECT film.title AS title, film.description AS description, actor.last_name as actor, category.name AS genre FROM film
         JOIN film_actor ON film.film_id = film_actor.film_id
         JOIN actor ON film_actor.actor_id = actor.actor_id
         JOIN film_category ON film.film_id = film_category.film_id
@@ -36,7 +37,7 @@ router.get('/film', function (req, res, next) {
                 results = results.filter (
                     r => (searchObject.title ? r.title.toLowerCase().indexOf(searchObject.title.toLowerCase()) >= 0 : true) &&
                     (searchObject.actor ? r.actor.toLowerCase().indexOf(searchObject.actor.toLowerCase()) >= 0 : true) &&
-                    (searchObject.category ? r.category.toLowerCase().indexOf(searchObject.category.toLowerCase()) >= 0 : true)
+                    (searchObject.genre ? r.genre.toLowerCase().indexOf(searchObject.genre.toLowerCase()) >= 0 : true)
                 )
                 res.send(results);
             }
@@ -66,7 +67,6 @@ router.get('/actor', function (req, res, next) {
 });
 
 //Rental APIs
-//Get Available Films
 router.get('/rental/film=:film_title', function (req, res, next) {
     connection.query(
         `SELECT DISTINCT film.title AS title, film.description AS description, address.address AS store_address FROM film
@@ -86,6 +86,6 @@ router.get('/rental/film=:film_title', function (req, res, next) {
 app.use('/api/', router);
 
 //
-var server = app.listen(5000, function() {
-    console.log('Node server is running on http://localhost:5000...');
+var server = app.listen(process.env.APP_PORT, function() {
+    console.log('Node server is running on http://localhost:'+process.env.APP_PORT+'...');
 });

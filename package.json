@@ -9,16 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rkcbalanza/pw_nodejs_2022.git"
+    "url": "git+https://github.com/rkcbalanza/rkc_nodejs_training.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rkcbalanza/pw_nodejs_2022/issues"
+    "url": "https://github.com/rkcbalanza/rkc_nodejs_training/issues"
   },
-  "homepage": "https://github.com/rkcbalanza/pw_nodejs_2022#readme",
+  "homepage": "https://github.com/rkcbalanza/rkc_nodejs_training#readme",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "mysql2": "^2.3.3",
     "nodemon": "^2.0.20"
