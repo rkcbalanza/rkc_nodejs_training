@@ -92,7 +92,7 @@ module.exports = {
         getActorsbyFirstNameorLastName(searchObject, (err, results) => {
             if (err) {
                 console.log(err);
-                return res.status(500),json({
+                return res.status(500).json({
                     success : 0,
                     message : 'Database Connection Error!'
                 });

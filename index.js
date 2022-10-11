@@ -5,12 +5,16 @@ let app = express();
 //const pool = require('./config/database');
 const actorRouter = require('./api/actor/actor.router');
 const filmRouter = require('./api/film/film.router');
-const staffRouter = require('./api/staff/staff.router')
+const customerRouter = require('./api/customer/customer.router');
+const staffRouter = require('./api/staff/staff.router');
+const rentalRouter = require('./api/rental/rental.router');
 
 app.use(express.json());
 app.use('./api/staff', staffRouter);
 app.use('/api/actor', actorRouter);
+app.use('/api/customer', customerRouter);
 app.use('/api/film', filmRouter);
+app.use('/api/rental', rentalRouter);
 //
 // let router = express.Router();
 
